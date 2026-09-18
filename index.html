@@ -782,9 +782,9 @@ function renderCart(){
         <svg viewBox="0 0 32 32" fill="currentColor"><path d="M16 2.9C8.8 2.9 2.9 8.8 2.9 16c0 2.5.7 4.9 1.9 7L3 29l6.2-1.6c2 1.1 4.3 1.7 6.7 1.7 7.2 0 13.1-5.9 13.1-13.1S23.2 2.9 16 2.9z"/></svg>
         Order via WhatsApp
       </button>
-      <a class="btn-block btn-secondary" href="https://hmhadi.com/cart/" target="_blank">
-        Checkout on Website
-      </a>
+      <button class="btn-block btn-secondary" onclick="checkoutOnWebsite()">
+  Checkout on Website
+</button>
     </div>`;
 }
 
@@ -799,6 +799,29 @@ function checkoutWhatsApp(){
   msg += `\nTotal: ${fmt(cartTotal())}\n\nPlease confirm my order. Thank you!`;
   if(currentUser) msg += `\n\n(Customer: ${currentUser.name || ""} - ${currentUser.email || ""})`;
   window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`, "_blank");
+  function checkoutOnWebsite(){
+  const entries = Object.entries(cart);
+  if(!entries.length){
+    toast("Cart is empty");
+    return;
+  }
+
+  // Pehle saari products WooCommerce cart mein add karo
+  // (ek ek karke URL se)
+  entries.forEach(([id, qty], index) => {
+    setTimeout(() => {
+      // silent add via image pixel / request
+      const img = new Image();
+      img.src = `https://hmhadi.com/?add-to-cart=${id}&quantity=${qty}`;
+    }, index * 400);
+  });
+
+  // Thodi der baad cart page open karo
+  setTimeout(() => {
+    window.open("https://hmhadi.com/cart/", "_blank");
+    toast("Opening website cart...");
+  }, entries.length * 400 + 600);
+}
 }
 
 /* ================= ACCOUNT / LOGIN ================= */
